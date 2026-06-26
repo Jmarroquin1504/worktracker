@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Actividades</title>
+<style>
+  :root {
+    --bg: #F7F6F3;
+    --surface: #FFFFFF;
+    --surface-2: #F1F0EC;
+    --border: #E2E0D8;
+    --border-strong: #C8C6BC;
+    --text: #1A1916;
+    --text-2: #6B6860;
+    --text-3: #9E9C94;
+    --accent: #3B5BDB;
+    --accent-bg: #EEF2FF;
+    --accent-text: #2F4AC4;
+    --success: #2F9E44;
+    --success-bg: #EBFBEE;
+    --warning: #E67700;
+    --warning-bg: #FFF3CD;
+    --danger: #C92A2A;
+    --danger-bg: #FFF5F5;
+    --cat-reunion: #0F6E56;
+    --cat-reunion-bg: #E1F5EE;
+    --cat-admin: #185FA5;
+    --cat-admin-bg: #E6F1FB;
+    --cat-operativa: #854F0B;
+    --cat-operativa-bg: #FAEEDA;
+    --cat-estrategia: #534AB7;
+    --cat-estrategia-bg: #EEEDFE;
+    --cat-otro: #5F5E5A;
+    --cat-otro-bg: #F1EFE8;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ── Sidebar ── */
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 220px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .app-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .sidebar-logo .app-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 2px;
+  }
+
+  .sidebar-nav { padding: 12px 10px; flex: 1; }
+
+  .nav-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: 0 8px;
+    margin: 12px 0 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-2);
+    transition: background .12s, color .12s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+  }
+  .nav-item:hover { background: var(--surface-2); color: var(--text); }
+  .nav-item.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 500; }
+  .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .sidebar-footer {
+    padding: 12px 10px;
+    border-top: 1px solid var(--border);
+  }
+  .date-display {
+    font-size: 12px;
+    color: var(--text-3);
+    padding: 6px 10px;
+    text-align: center;
+  }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .page-title { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+  .page-date {
+    font-size: 12px;
+    color: var(--text-3);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+  input[type="date"] {
+    font-size: 12px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="date"]:focus { border-color: var(--accent); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background .12s, border-color .12s;
+    white-space: nowrap;
+  }
+  .btn svg { width: 15px; height: 15px; }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: #3451C7; }
+  .btn-ghost { background: transparent; color: var(--text-2); border-color: var(--border); }
+  .btn-ghost:hover { background: var(--surface-2); color: var(--text); }
+  .btn-danger-ghost { background: transparent; color: var(--danger); border-color: transparent; padding: 4px 8px; }
+  .btn-danger-ghost:hover { background: var(--danger-bg); }
+
+  /* ── Content ── */
+  .content { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* ── Metric cards ── */
+  .metrics-row { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .metric-card .label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .metric-card .label svg { width: 13px; height: 13px; }
+  .metric-card .value { font-size: 22px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); }
+  .metric-card .sub { font-size: 11px; color: var(--text-3); margin-top: 3px; }
+
+  /* ── Two-col layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 340px; gap: 16px; align-items: start; }
+
+  /* ── Panel ── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .panel-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .panel-body { padding: 18px; }
+
+  /* ── Form ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .form-full { grid-column: 1 / -1; }
+  .field label { font-size: 11px; font-weight: 600; color: var(--text-2); display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .04em; }
+
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    transition: border-color .12s;
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 60px; }
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button { opacity: 0; }
+
+  .time-row { display: flex; gap: 6px; align-items: center; }
+  .time-row input { flex: 1; }
+  .time-sep { color: var(--text-3); font-size: 16px; font-weight: 300; }
+
+  .cat-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .cat-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-2);
+    transition: all .12s;
+    user-select: none;
+  }
+  .cat-pill:hover { border-color: var(--border-strong); color: var(--text); }
+  .cat-pill.sel-reunion { background: var(--cat-reunion-bg); color: var(--cat-reunion); border-color: var(--cat-reunion); }
+  .cat-pill.sel-admin { background: var(--cat-admin-bg); color: var(--cat-admin); border-color: var(--cat-admin); }
+  .cat-pill.sel-operativa { background: var(--cat-operativa-bg); color: var(--cat-operativa); border-color: var(--cat-operativa); }
+  .cat-pill.sel-estrategia { background: var(--cat-estrategia-bg); color: var(--cat-estrategia); border-color: var(--cat-estrategia); }
+  .cat-pill.sel-otro { background: var(--cat-otro-bg); color: var(--cat-otro); border-color: var(--cat-otro); }
+
+  /* ── Table ── */
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: var(--surface-2); }
+
+  .act-name { font-weight: 500; font-size: 13px; color: var(--text); }
+  .act-note { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .badge-reunion { background: var(--cat-reunion-bg); color: var(--cat-reunion); }
+  .badge-admin { background: var(--cat-admin-bg); color: var(--cat-admin); }
+  .badge-operativa { background: var(--cat-operativa-bg); color: var(--cat-operativa); }
+  .badge-estrategia { background: var(--cat-estrategia-bg); color: var(--cat-estrategia); }
+  .badge-otro { background: var(--cat-otro-bg); color: var(--cat-otro); }
+
+  .bar-wrap { display: flex; align-items: center; gap: 8px; }
+  .bar-track { flex: 1; height: 5px; background: var(--surface-2); border-radius: 3px; overflow: hidden; min-width: 60px; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+  .bar-pct { font-size: 11px; color: var(--text-3); min-width: 34px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .time-val { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); }
+
+  /* ── Empty state ── */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-3);
+  }
+  .empty-state svg { width: 36px; height: 36px; margin-bottom: 10px; opacity: .4; }
+  .empty-state p { font-size: 13px; }
+
+  /* ── Resumen panel ── */
+  .resumen-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .resumen-cat { font-size: 12px; color: var(--text-2); width: 100px; flex-shrink: 0; }
+  .resumen-bar-track { flex: 1; height: 8px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .resumen-bar-fill { height: 100%; border-radius: 4px; }
+  .resumen-stat { font-size: 11px; color: var(--text-3); min-width: 80px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ── Historial ── */
+  .hist-day {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .hist-day-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface-2);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    user-select: none;
+  }
+  .hist-day-header:hover { background: var(--border); }
+  .hist-day-header .meta { font-size: 11px; color: var(--text-3); font-weight: 400; }
+  .hist-day-body { display: none; padding: 12px 14px; }
+  .hist-day-body.open { display: block; }
+  .hist-item { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; color: var(--text-2); border-bottom: 1px dashed var(--border); }
+  .hist-item:last-child { border-bottom: none; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--text);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .2s, transform .2s;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast svg { width: 16px; height: 16px; }
+
+  /* ── Reporte modal ── */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.35);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    overflow: hidden;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-title { font-size: 15px; font-weight: 600; }
+  .modal-close { background: none; border: none; cursor: pointer; color: var(--text-3); padding: 4px; border-radius: 4px; }
+  .modal-close:hover { background: var(--surface-2); color: var(--text); }
+  .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+  .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+  .report-section { margin-bottom: 20px; }
+  .report-section h3 { font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 10px; }
+  .report-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .report-table th { text-align: left; padding: 6px 10px; background: var(--surface-2); font-weight: 600; font-size: 11px; color: var(--text-2); }
+  .report-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  .report-table tr:last-child td { border-bottom: none; }
+
+  /* ── Pages ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Pendientes ── */
+  .prioridad-alta { color: var(--danger); background: var(--danger-bg); }
+  .prioridad-media { color: var(--warning); background: var(--warning-bg); }
+  .prioridad-baja { color: var(--success); background: var(--success-bg); }
+
+  .estado-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 20px; white-space: nowrap;
+  }
+  .estado-pendiente { background: #FFF3CD; color: #856404; }
+  .estado-proceso   { background: #E6F1FB; color: #185FA5; }
+  .estado-resuelto  { background: #EBFBEE; color: #2F9E44; }
+
+  .pend-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .pend-row:last-child { border-bottom: none; }
+  .pend-row:hover { background: var(--surface-2); }
+  .pend-check { width: 18px; height: 18px; border: 2px solid var(--border-strong); border-radius: 50%; cursor: pointer; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+  .pend-check.resuelto { background: var(--success); border-color: var(--success); }
+  .pend-check.resuelto::after { content: '✓'; color: #fff; font-size: 10px; font-weight: 700; }
+  .pend-check.proceso { background: var(--accent); border-color: var(--accent); }
+  .pend-check.proceso::after { content: '▶'; color: #fff; font-size: 8px; }
+  .pend-body { flex: 1; min-width: 0; }
+  .pend-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .pend-title.done { text-decoration: line-through; color: var(--text-3); }
+  .pend-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .pend-tiempo { font-size: 11px; color: var(--text-3); display: flex; align-items: center; gap: 3px; }
+  .pend-tiempo.activo { color: var(--accent); font-weight: 600; }
+  .pend-badge { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 3px; }
+  .pend-actions { display: flex; gap: 4px; flex-shrink: 0; margin-top: 2px; }
+  .pend-btn { background: none; border: 1px solid var(--border); border-radius: 5px; padding: 3px 8px; font-size: 11px; cursor: pointer; color: var(--text-2); transition: all .12s; }
+  .pend-btn:hover { background: var(--surface-2); }
+  .pend-btn.iniciar { border-color: var(--accent); color: var(--accent); }
+  .pend-btn.iniciar:hover { background: var(--accent-bg); }
+  .pend-btn.pausar { border-color: var(--warning); color: var(--warning); }
+  .pend-btn.pausar:hover { background: var(--warning-bg); }
+  .pend-btn.resolver { border-color: var(--success); color: var(--success); }
+  .pend-btn.resolver:hover { background: var(--success-bg); }
+  .pend-btn.danger { border-color: transparent; color: var(--text-3); }
+  .pend-btn.danger:hover { color: var(--danger); border-color: var(--danger); }
+
+  .cronometro { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); letter-spacing: -0.02em; }
+
+  .prio-pill { cursor: pointer; border: none; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .two-col { grid-template-columns: 1fr; }
+    .metrics-row { grid-template-columns: repeat(2, 1fr); }
+    .sidebar { width: 56px; }
+    .sidebar .app-name, .sidebar .app-sub, .nav-label, .nav-item span { display: none; }
+    .nav-item { justify-content: center; padding: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="app-name">WorkTracker</div>
+      <div class="app-sub">Registro de actividades</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Principal</div>
+      <button class="nav-item active" onclick="showPage('registro', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Registro diario</span>
+      </button>
+      <button class="nav-item" onclick="showPage('historial', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 0 .5-4.5"/><polyline points="3 3 3.05 11 11 10.94"/></svg>
+        <span>Historial</span>
+      </button>
+      <button class="nav-item" onclick="showPage('pendientes', this)" id="nav-pendientes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        <span>Pendientes <span id="badge-pend" style="display:none;background:var(--danger);color:#fff;border-radius:10px;padding:0 5px;font-size:10px;margin-left:2px"></span></span>
+      </button>
+      <button class="nav-item" onclick="showPage('estadisticas', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        <span>Estadísticas</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="date-display" id="sb-date"></div>
+      <div style="display:flex;flex-direction:column;gap:6px;padding:8px 10px">
+        <button class="nav-item" onclick="exportarBackup()" style="font-size:12px;color:var(--success);justify-content:flex-start;gap:8px;padding:7px 10px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;flex-shrink:0"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Guardar respaldo</span>
+        </button>
+        <button class="nav-item" onclick="document.getElementById('import-file').click()" style="font-size:12px;color:var(--accent);justify-content:flex-start;gap:8px;padding:7px 10px;cursor:pointer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;flex-shrink:0"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Restaurar respaldo</span>
+        </button>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importarBackup(this)">
+        <div style="border-top:1px solid var(--border);margin:4px 0"></div>
+        <button class="nav-item" onclick="document.getElementById('excel-import-file').click()" style="font-size:12px;color:#1D9E75;justify-content:flex-start;gap:8px;padding:7px 10px;cursor:pointer" title="Importa el Excel generado por Power Automate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;flex-shrink:0"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="17 15 12 10 7 15"/><line x1="12" y1="10" x2="12" y2="21"/></svg>
+          <span>Importar reuniones Teams</span>
+        </button>
+        <input type="file" id="excel-import-file" accept="*/*" style="display:none" onchange="importarExcelTeams(this)">
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="page-title" id="tb-title">Registro diario</span>
+        <span class="page-date" id="tb-date"></span>
+      </div>
+      <div class="topbar-right">
+        <input type="date" id="fecha-sel" onchange="cambiarFecha()">
+        <button class="btn btn-ghost" onclick="abrirReporte()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Ver reporte
+        </button>
+        <button class="btn btn-primary" onclick="document.getElementById('f-actividad').focus()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nueva actividad
+        </button>
+      </div>
+    </div>
+
+    <!-- Page: Registro -->
+    <div class="content page active" id="page-registro">
+
+      <!-- Métricas -->
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Tiempo total
+          </div>
+          <div class="value" id="m-total">0h 0m</div>
+          <div class="sub" id="m-count">Sin actividades</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Mayor consumo
+          </div>
+          <div class="value" id="m-top" style="font-size:15px;padding-top:4px">—</div>
+          <div class="sub" id="m-top-pct"></div>
+        </div>
+        <div class="metric-card">
+          <div class="label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Categorías
+          </div>
+          <div class="value" id="m-cats">0</div>
+          <div class="sub">distintas hoy</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Días registrados
+          </div>
+          <div class="value" id="m-dias">0</div>
+          <div class="sub">en total</div>
+        </div>
+      </div>
+
+      <!-- Dos columnas -->
+      <div class="two-col">
+
+        <!-- Tabla de actividades -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Actividades del día</span>
+            <span id="total-badge" style="font-size:11px;color:var(--text-3)"></span>
+          </div>
+          <div class="table-scroll">
+            <div id="empty-state" class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+              <p>Agrega tu primera actividad del día</p>
+            </div>
+            <table id="tabla" style="display:none">
+              <thead>
+                <tr>
+                  <th>Actividad</th>
+                  <th>Tiempo</th>
+                  <th>Categoría</th>
+                  <th>% del día</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Panel derecho -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+
+          <!-- Formulario -->
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Agregar actividad</span>
+            </div>
+            <div class="panel-body">
+              <div class="form-grid">
+                <div class="field form-full">
+                  <label>Actividad</label>
+                  <input type="text" id="f-actividad" placeholder="Ej: Reunión de equipo" />
+                </div>
+                <div class="field form-full">
+                  <label>Tiempo invertido</label>
+                  <div class="time-row">
+                    <input type="number" id="f-horas" placeholder="Horas" min="0" max="23" />
+                    <span class="time-sep">:</span>
+                    <input type="number" id="f-min" placeholder="Minutos" min="0" max="59" />
+                  </div>
+                </div>
+                <div class="field form-full">
+                  <label>Categoría</label>
+                  <div class="cat-pills" id="cat-pills">
+                    <span class="cat-pill" data-cat="Reunión" onclick="selCat(this)">Reunión</span>
+                    <span class="cat-pill" data-cat="Administrativa" onclick="selCat(this)">Administrativa</span>
+                    <span class="cat-pill" data-cat="Operativa" onclick="selCat(this)">Operativa</span>
+                    <span class="cat-pill" data-cat="Estrategia" onclick="selCat(this)">Estrategia</span>
+                    <span class="cat-pill" data-cat="Otro" onclick="selCat(this)">Otro</span>
+                  </div>
+                </div>
+                <div class="field form-full">
+                  <label>Notas (opcional)</label>
+                  <textarea id="f-notas" placeholder="¿Fue necesario? ¿Se puede optimizar?"></textarea>
+                </div>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="agregar()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Agregar actividad
+              </button>
+            </div>
+          </div>
+
+          <!-- Distribución -->
+          <div class="panel" id="panel-resumen" style="display:none">
+            <div class="panel-header">
+              <span class="panel-title">Distribución</span>
+            </div>
+            <div class="panel-body" id="resumen-body"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: Historial -->
+    <div class="content page" id="page-historial">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Historial de días</span>
+          <span style="font-size:11px;color:var(--text-3)" id="hist-count"></span>
+        </div>
+        <div class="panel-body" id="hist-body">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 0 .5-4.5"/><polyline points="3 3 3.05 11 11 10.94"/></svg>
+            <p>Aún no hay días guardados</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: Pendientes -->
+    <div class="content page" id="page-pendientes">
+
+      <!-- métricas pendientes -->
+      <div class="metrics-row" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+        <div class="metric-card">
+          <div class="label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Pendientes abiertos
+          </div>
+          <div class="value" id="pm-abiertos">0</div>
+          <div class="sub" id="pm-alta" style="color:var(--danger)"></div>
+        </div>
+        <div class="metric-card">
+          <div class="label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Tiempo invertido
+          </div>
+          <div class="value" id="pm-tiempo">0m</div>
+          <div class="sub">en pendientes</div>
+        </div>
+        <div class="metric-card">
+          <div class="label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Resueltos
+          </div>
+          <div class="value" id="pm-resueltos">0</div>
+          <div class="sub" id="pm-tiempo-resueltos"></div>
+        </div>
+        <div class="metric-card">
+          <div class="label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            En progreso
+          </div>
+          <div class="value" id="pm-proceso" style="color:var(--accent)">0</div>
+          <div class="sub" id="pm-cronometro" class="cronometro"></div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Lista pendientes -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Mis pendientes</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select id="filtro-pend" onchange="renderPendientes()" style="font-size:12px;padding:3px 8px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer">
+                <option value="todos">Todos</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="proceso">En proceso</option>
+                <option value="resuelto">Resueltos</option>
+              </select>
+            </div>
+          </div>
+          <div id="pend-empty" class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            <p>Sin pendientes registrados. Agrega uno desde el panel derecho.</p>
+          </div>
+          <div id="pend-lista"></div>
+        </div>
+
+        <!-- Formulario pendiente -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Nuevo pendiente</span></div>
+            <div class="panel-body">
+              <div class="field" style="margin-bottom:10px">
+                <label>Descripción del pendiente</label>
+                <input type="text" id="pf-titulo" placeholder="Ej: Resolver error en reporte mensual" />
+              </div>
+              <div class="field" style="margin-bottom:10px">
+                <label>Prioridad</label>
+                <div style="display:flex;gap:6px;margin-top:4px" id="pf-prio-wrap">
+                  <span class="prio-pill prioridad-alta" data-prio="alta" onclick="selPrio(this)">Alta</span>
+                  <span class="prio-pill prioridad-media" data-prio="media" onclick="selPrio(this)" style="opacity:.45">Media</span>
+                  <span class="prio-pill prioridad-baja" data-prio="baja" onclick="selPrio(this)" style="opacity:.45">Baja</span>
+                </div>
+              </div>
+              <div class="field" style="margin-bottom:10px">
+                <label>Categoría</label>
+                <select id="pf-cat" style="width:100%;font-size:13px">
+                  <option>Operativa</option>
+                  <option>Administrativa</option>
+                  <option>Estrategia</option>
+                  <option>Reunión</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:12px">
+                <label>Notas (opcional)</label>
+                <textarea id="pf-notas" placeholder="Contexto, bloqueadores, pasos a seguir..." style="min-height:50px"></textarea>
+              </div>
+              <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="agregarPendiente()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Agregar pendiente
+              </button>
+            </div>
+          </div>
+
+          <!-- Resumen por categoría pendientes -->
+          <div class="panel" id="panel-pend-resumen" style="display:none">
+            <div class="panel-header"><span class="panel-title">Tiempo por categoría</span></div>
+            <div class="panel-body" id="pend-resumen-body"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page: Estadísticas -->
+    <div class="content page" id="page-estadisticas">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Resumen general</span>
+        </div>
+        <div class="panel-body" id="stats-body">
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <p>Agrega actividades para ver estadísticas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Reporte modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)cerrarModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Reporte del día</span>
+      <button class="modal-close" onclick="cerrarModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="exportarCSV()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar CSV
+      </button>
+      <button class="btn btn-primary" onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Restore modal -->
+<div class="overlay" id="overlay-restore" onclick="if(event.target===this)cerrarRestore()">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <span class="modal-title">Restaurar respaldo</span>
+      <button class="modal-close" onclick="cerrarRestore()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="restore-info"></div>
+      <div id="restore-backup-data" data-backup=""></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="cerrarRestore()">Cancelar</button>
+      <button class="btn btn-primary" style="background:var(--danger);border-color:var(--danger)" onclick="confirmarRestore()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+        Sí, restaurar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-msg">Guardado</span>
+</div>
+
+<script>
+const CAT_COLORS = {
+  'Reunión': '#1D9E75',
+  'Administrativa': '#185FA5',
+  'Operativa': '#BA7517',
+  'Estrategia': '#534AB7',
+  'Otro': '#888780'
+};
+const CAT_BADGE = {
+  'Reunión': 'badge-reunion',
+  'Administrativa': 'badge-admin',
+  'Operativa': 'badge-operativa',
+  'Estrategia': 'badge-estrategia',
+  'Otro': 'badge-otro'
+};
+
+let datos = JSON.parse(localStorage.getItem('worktracker') || '{}');
+let fechaActual = hoy();
+let catSel = '';
+
+function hoy() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function formatFecha(f) {
+  const [y, m, d] = f.split('-');
+  const names = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const mnames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const dt = new Date(y, m-1, d);
+  return names[dt.getDay()] + ', ' + d + ' de ' + mnames[m-1] + ' de ' + y;
+}
+
+function minStr(min) {
+  const h = Math.floor(min / 60), m = min % 60;
+  return h > 0 ? (m > 0 ? h + 'h ' + m + 'm' : h + 'h') : m + 'm';
+}
+
+function init() {
+  const fi = document.getElementById('fecha-sel');
+  fi.value = fechaActual;
+  actualizarTopbar();
+  document.getElementById('sb-date').textContent = new Date().toLocaleDateString('es-ES', {day:'2-digit', month:'short'});
+  render();
+}
+
+function actualizarTopbar() {
+  document.getElementById('tb-date').textContent = formatFecha(fechaActual);
+}
+
+function cambiarFecha() {
+  fechaActual = document.getElementById('fecha-sel').value || hoy();
+  actualizarTopbar();
+  render();
+}
+
+function selCat(el) {
+  document.querySelectorAll('.cat-pill').forEach(p => {
+    p.className = 'cat-pill';
+  });
+  const cat = el.dataset.cat;
+  catSel = cat;
+  const cls = {
+    'Reunión': 'sel-reunion',
+    'Administrativa': 'sel-admin',
+    'Operativa': 'sel-operativa',
+    'Estrategia': 'sel-estrategia',
+    'Otro': 'sel-otro'
+  }[cat] || '';
+  el.classList.add(cls);
+}
+
+function agregar() {
+  const act = document.getElementById('f-actividad').value.trim();
+  const h = parseInt(document.getElementById('f-horas').value) || 0;
+  const m = parseInt(document.getElementById('f-min').value) || 0;
+  const notas = document.getElementById('f-notas').value.trim();
+  const mins = h * 60 + m;
+
+  if (!act) { toast('Escribe el nombre de la actividad', true); return; }
+  if (mins <= 0) { toast('Ingresa el tiempo invertido', true); return; }
+  if (!catSel) { toast('Selecciona una categoría', true); return; }
+
+  if (!datos[fechaActual]) datos[fechaActual] = [];
+  datos[fechaActual].push({ id: Date.now(), act, mins, cat: catSel, notas });
+  guardar();
+
+  document.getElementById('f-actividad').value = '';
+  document.getElementById('f-horas').value = '';
+  document.getElementById('f-min').value = '';
+  document.getElementById('f-notas').value = '';
+  document.querySelectorAll('.cat-pill').forEach(p => p.className = 'cat-pill');
+  catSel = '';
+  toast('Actividad agregada');
+  render();
+}
+
+function eliminar(id) {
+  if (!datos[fechaActual]) return;
+  datos[fechaActual] = datos[fechaActual].filter(a => a.id !== id);
+  if (datos[fechaActual].length === 0) delete datos[fechaActual];
+  guardar();
+  render();
+}
+
+function guardar() {
+  localStorage.setItem('worktracker', JSON.stringify(datos));
+}
+
+function render() {
+  const acts = datos[fechaActual] || [];
+  const total = acts.reduce((s, a) => s + a.mins, 0);
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+
+  if (acts.length === 0) {
+    document.getElementById('empty-state').style.display = 'block';
+    document.getElementById('tabla').style.display = 'none';
+    document.getElementById('panel-resumen').style.display = 'none';
+  } else {
+    document.getElementById('empty-state').style.display = 'none';
+    document.getElementById('tabla').style.display = 'table';
+    document.getElementById('panel-resumen').style.display = 'block';
+
+    acts.forEach(a => {
+      const pct = total > 0 ? Math.round(a.mins / total * 100) : 0;
+      const color = CAT_COLORS[a.cat] || '#888';
+      const badge = CAT_BADGE[a.cat] || 'badge-otro';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <div class="act-name">${a.act}</div>
+          ${a.notas ? '<div class="act-note">' + a.notas + '</div>' : ''}
+        </td>
+        <td><span class="time-val">${minStr(a.mins)}</span></td>
+        <td><span class="badge ${badge}">${a.cat}</span></td>
+        <td>
+          <div class="bar-wrap">
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+            <span class="bar-pct">${pct}%</span>
+          </div>
+        </td>
+        <td>
+          <button class="btn btn-danger-ghost" onclick="eliminar(${a.id})" title="Eliminar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+
+    renderResumen(acts, total);
+  }
+
+  renderMetricas(acts, total);
+  renderHistorial();
+  renderEstadisticas();
+}
+
+function renderResumen(acts, total) {
+  const bycat = {};
+  acts.forEach(a => { bycat[a.cat] = (bycat[a.cat] || 0) + a.mins; });
+  const wrap = document.getElementById('resumen-body');
+  wrap.innerHTML = '';
+  Object.entries(bycat).sort((a, b) => b[1] - a[1]).forEach(([cat, mins]) => {
+    const pct = total > 0 ? Math.round(mins / total * 100) : 0;
+    const color = CAT_COLORS[cat] || '#888';
+    const row = document.createElement('div');
+    row.className = 'resumen-row';
+    row.innerHTML = `
+      <span class="resumen-cat">${cat}</span>
+      <div class="resumen-bar-track"><div class="resumen-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      <span class="resumen-stat">${minStr(mins)} · ${pct}%</span>`;
+    wrap.appendChild(row);
+  });
+}
+
+function renderMetricas(acts, total) {
+  const bycat = {};
+  acts.forEach(a => { bycat[a.cat] = (bycat[a.cat] || 0) + a.mins; });
+  const cats = Object.keys(bycat);
+
+  document.getElementById('m-total').textContent = minStr(total) || '0m';
+  document.getElementById('m-count').textContent = acts.length + ' actividad' + (acts.length !== 1 ? 'es' : '');
+
+  if (cats.length > 0) {
+    const topCat = cats.reduce((a, b) => bycat[a] > bycat[b] ? a : b);
+    document.getElementById('m-top').textContent = topCat;
+    document.getElementById('m-top-pct').textContent = Math.round(bycat[topCat] / total * 100) + '% del tiempo';
+  } else {
+    document.getElementById('m-top').textContent = '—';
+    document.getElementById('m-top-pct').textContent = '';
+  }
+
+  document.getElementById('m-cats').textContent = cats.length;
+  document.getElementById('m-dias').textContent = Object.keys(datos).length;
+  document.getElementById('total-badge').textContent = acts.length > 0 ? minStr(total) + ' registrados' : '';
+}
+
+function renderHistorial() {
+  const dias = Object.keys(datos).sort((a, b) => b.localeCompare(a));
+  const wrap = document.getElementById('hist-body');
+  document.getElementById('hist-count').textContent = dias.length + ' día' + (dias.length !== 1 ? 's' : '');
+
+  if (dias.length === 0) {
+    wrap.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 1 0 .5-4.5"/></svg><p>Aún no hay días guardados</p></div>';
+    return;
+  }
+  wrap.innerHTML = '';
+  dias.forEach(dia => {
+    const acts = datos[dia];
+    const total = acts.reduce((s, a) => s + a.mins, 0);
+    const div = document.createElement('div');
+    div.className = 'hist-day';
+    div.innerHTML = `
+      <div class="hist-day-header" onclick="toggleHist(this)">
+        <span>${formatFecha(dia)}</span>
+        <span class="meta">${acts.length} actividades · ${minStr(total)}</span>
+      </div>
+      <div class="hist-day-body ${dia === fechaActual ? 'open' : ''}">
+        ${acts.map(a => `<div class="hist-item"><span>${a.act} <span class="badge ${CAT_BADGE[a.cat]||'badge-otro'}" style="margin-left:6px">${a.cat}</span></span><span style="font-weight:600">${minStr(a.mins)}</span></div>`).join('')}
+      </div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function toggleHist(el) {
+  const body = el.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function renderEstadisticas() {
+  const dias = Object.keys(datos);
+  const wrap = document.getElementById('stats-body');
+  if (dias.length === 0) {
+    wrap.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><p>Agrega actividades para ver estadísticas</p></div>';
+    return;
+  }
+
+  const allActs = dias.flatMap(d => datos[d]);
+  const totalMins = allActs.reduce((s, a) => s + a.mins, 0);
+  const byCat = {};
+  allActs.forEach(a => { byCat[a.cat] = (byCat[a.cat] || 0) + a.mins; });
+  const topCat = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+
+  wrap.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px">
+      <div class="metric-card"><div class="label">Total acumulado</div><div class="value">${minStr(totalMins)}</div><div class="sub">${allActs.length} actividades</div></div>
+      <div class="metric-card"><div class="label">Promedio por día</div><div class="value">${minStr(Math.round(totalMins / dias.length))}</div><div class="sub">en ${dias.length} días</div></div>
+      <div class="metric-card"><div class="label">Categoría principal</div><div class="value" style="font-size:14px;padding-top:4px">${topCat[0]?.[0] || '—'}</div><div class="sub">${topCat[0] ? Math.round(topCat[0][1] / totalMins * 100) + '% del total' : ''}</div></div>
+    </div>
+    <div style="font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Distribución total por categoría</div>
+    ${topCat.map(([cat, mins]) => {
+      const pct = Math.round(mins / totalMins * 100);
+      const color = CAT_COLORS[cat] || '#888';
+      return `<div class="resumen-row"><span class="resumen-cat">${cat}</span><div class="resumen-bar-track"><div class="resumen-bar-fill" style="width:${pct}%;background:${color}"></div></div><span class="resumen-stat">${minStr(mins)} · ${pct}%</span></div>`;
+    }).join('')}`;
+}
+
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  btn.classList.add('active');
+  const titles = { registro: 'Registro diario', historial: 'Historial', estadisticas: 'Estadísticas', pendientes: 'Pendientes' };
+  document.getElementById('tb-title').textContent = titles[page] || page;
+  if (page === 'historial') renderHistorial();
+  if (page === 'estadisticas') renderEstadisticas();
+  if (page === 'pendientes') renderPendientes();
+}
+
+// ── Pendientes ──────────────────────────────────────────
+let pendientes = JSON.parse(localStorage.getItem('worktracker-pend') || '[]');
+let prioSel = 'alta';
+let timerInterval = null;
+
+function guardarPend() {
+  localStorage.setItem('worktracker-pend', JSON.stringify(pendientes));
+  actualizarBadgePend();
+}
+
+function actualizarBadgePend() {
+  const abiertos = pendientes.filter(p => p.estado !== 'resuelto').length;
+  const badge = document.getElementById('badge-pend');
+  if (badge) { badge.textContent = abiertos; badge.style.display = abiertos > 0 ? 'inline' : 'none'; }
+}
+
+function selPrio(el) {
+  document.querySelectorAll('#pf-prio-wrap .prio-pill').forEach(p => p.style.opacity = '.45');
+  el.style.opacity = '1';
+  prioSel = el.dataset.prio;
+}
+
+function agregarPendiente() {
+  const titulo = document.getElementById('pf-titulo').value.trim();
+  const notas = document.getElementById('pf-notas').value.trim();
+  const cat = document.getElementById('pf-cat').value;
+  if (!titulo) { toast('Escribe la descripción del pendiente', true); return; }
+  pendientes.unshift({ id: Date.now(), titulo, prio: prioSel, cat, notas, estado: 'pendiente', minsTrabajados: 0, inicioTimer: null, creadoEn: new Date().toISOString() });
+  guardarPend();
+  document.getElementById('pf-titulo').value = '';
+  document.getElementById('pf-notas').value = '';
+  toast('Pendiente agregado');
+  renderPendientes();
+}
+
+function iniciarPendiente(id) {
+  pendientes.forEach(p => {
+    if (p.estado === 'proceso') {
+      p.minsTrabajados += Math.round((Date.now() - p.inicioTimer) / 60000);
+      p.inicioTimer = null; p.estado = 'pendiente';
+    }
+  });
+  const p = pendientes.find(x => x.id === id);
+  if (!p) return;
+  p.estado = 'proceso'; p.inicioTimer = Date.now();
+  guardarPend(); renderPendientes(); iniciarTimer();
+}
+
+function pausarPendiente(id) {
+  const p = pendientes.find(x => x.id === id);
+  if (!p || !p.inicioTimer) return;
+  p.minsTrabajados += Math.round((Date.now() - p.inicioTimer) / 60000);
+  p.inicioTimer = null; p.estado = 'pendiente';
+  guardarPend(); renderPendientes(); clearInterval(timerInterval);
+}
+
+function resolverPendiente(id) {
+  const p = pendientes.find(x => x.id === id);
+  if (!p) return;
+  if (p.inicioTimer) { p.minsTrabajados += Math.round((Date.now() - p.inicioTimer) / 60000); p.inicioTimer = null; }
+  p.estado = 'resuelto'; p.resueltaEn = new Date().toISOString();
+  guardarPend(); renderPendientes(); clearInterval(timerInterval);
+  toast('Pendiente resuelto · ' + minStr(p.minsTrabajados) + ' invertidos');
+}
+
+function eliminarPendiente(id) {
+  const p = pendientes.find(x => x.id === id);
+  if (p && p.inicioTimer) clearInterval(timerInterval);
+  pendientes = pendientes.filter(x => x.id !== id);
+  guardarPend(); renderPendientes();
+}
+
+function iniciarTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const en = pendientes.find(p => p.estado === 'proceso');
+    const el = document.getElementById('pm-cronometro');
+    if (en && el) {
+      const secsExtra = Math.round((Date.now() - en.inicioTimer) / 1000);
+      const totalSecs = en.minsTrabajados * 60 + secsExtra;
+      const h = Math.floor(totalSecs / 3600), m = Math.floor((totalSecs % 3600) / 60), s = totalSecs % 60;
+      el.textContent = (h > 0 ? h + 'h ' : '') + m + 'm ' + String(s).padStart(2,'0') + 's';
+    }
+    const rowEl = document.getElementById('timer-live');
+    if (en && rowEl) {
+      const secsExtra = Math.round((Date.now() - en.inicioTimer) / 1000);
+      const totalSecs = en.minsTrabajados * 60 + secsExtra;
+      const h = Math.floor(totalSecs / 3600), m = Math.floor((totalSecs % 3600) / 60), s = totalSecs % 60;
+      rowEl.textContent = (h > 0 ? h + 'h ' : '') + m + 'm ' + String(s).padStart(2,'0') + 's';
+    }
+  }, 1000);
+}
+
+function renderPendientes() {
+  const filtro = document.getElementById('filtro-pend')?.value || 'todos';
+  const lista = filtro === 'todos' ? pendientes : pendientes.filter(p => p.estado === filtro);
+
+  const abiertos = pendientes.filter(p => p.estado !== 'resuelto').length;
+  const resueltos = pendientes.filter(p => p.estado === 'resuelto').length;
+  const enProceso = pendientes.find(p => p.estado === 'proceso');
+  const alta = pendientes.filter(p => p.prio === 'alta' && p.estado !== 'resuelto').length;
+  const totalMins = pendientes.reduce((s, p) => s + (p.minsTrabajados || 0), 0);
+  const minsResueltos = pendientes.filter(p => p.estado === 'resuelto').reduce((s, p) => s + (p.minsTrabajados || 0), 0);
+
+  document.getElementById('pm-abiertos').textContent = abiertos;
+  document.getElementById('pm-alta').textContent = alta > 0 ? alta + ' de prioridad alta' : '';
+  document.getElementById('pm-tiempo').textContent = minStr(totalMins) || '0m';
+  document.getElementById('pm-resueltos').textContent = resueltos;
+  document.getElementById('pm-tiempo-resueltos').textContent = resueltos > 0 ? minStr(minsResueltos) + ' invertidos' : '';
+  document.getElementById('pm-proceso').textContent = enProceso ? '1' : '0';
+  document.getElementById('pm-cronometro').textContent = enProceso ? '...' : 'ninguno activo';
+
+  const wrap = document.getElementById('pend-lista');
+  const empty = document.getElementById('pend-empty');
+  wrap.innerHTML = '';
+
+  if (lista.length === 0) { empty.style.display = 'block'; document.getElementById('panel-pend-resumen').style.display = 'none'; return; }
+  empty.style.display = 'none';
+  document.getElementById('panel-pend-resumen').style.display = 'block';
+
+  const prioOrder = { alta: 0, media: 1, baja: 2 };
+  const sorted = [...lista].sort((a, b) => {
+    if (a.estado === 'proceso') return -1; if (b.estado === 'proceso') return 1;
+    if (a.estado === 'resuelto' && b.estado !== 'resuelto') return 1;
+    if (b.estado === 'resuelto' && a.estado !== 'resuelto') return -1;
+    return (prioOrder[a.prio] || 1) - (prioOrder[b.prio] || 1);
+  });
+
+  sorted.forEach(p => {
+    const isEnProceso = p.estado === 'proceso';
+    const isResuelto = p.estado === 'resuelto';
+    const minsTotal = p.minsTrabajados || 0;
+    const prioClass = { alta: 'prioridad-alta', media: 'prioridad-media', baja: 'prioridad-baja' }[p.prio] || '';
+    const estadoClass = { pendiente: 'estado-pendiente', proceso: 'estado-proceso', resuelto: 'estado-resuelto' }[p.estado] || '';
+    const badgeCat = CAT_BADGE[p.cat] || 'badge-otro';
+
+    const div = document.createElement('div');
+    div.className = 'pend-row';
+    div.innerHTML = `
+      <div class="pend-check ${isResuelto ? 'resuelto' : isEnProceso ? 'proceso' : ''}" onclick="${isResuelto ? '' : 'resolverPendiente(' + p.id + ')'}"></div>
+      <div class="pend-body">
+        <div class="pend-title ${isResuelto ? 'done' : ''}">${p.titulo}</div>
+        <div class="pend-meta">
+          <span class="estado-pill ${estadoClass}">${p.estado === 'proceso' ? '▶ En proceso' : p.estado === 'resuelto' ? '✓ Resuelto' : 'Pendiente'}</span>
+          <span class="badge pend-badge ${prioClass}">${p.prio}</span>
+          <span class="badge pend-badge ${badgeCat}">${p.cat}</span>
+          <span class="pend-tiempo ${isEnProceso ? 'activo' : ''}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${isEnProceso ? '<span id="timer-live">0m 00s</span>' : (minsTotal > 0 ? minStr(minsTotal) : 'sin tiempo')}
+          </span>
+          ${p.notas ? '<span style="font-size:11px;color:var(--text-3)">· ' + p.notas + '</span>' : ''}
+        </div>
+      </div>
+      <div class="pend-actions">
+        ${!isResuelto && !isEnProceso ? '<button class="pend-btn iniciar" onclick="iniciarPendiente(' + p.id + ')">▶ Iniciar</button>' : ''}
+        ${isEnProceso ? '<button class="pend-btn pausar" onclick="pausarPendiente(' + p.id + ')">⏸ Pausar</button>' : ''}
+        ${!isResuelto ? '<button class="pend-btn resolver" onclick="resolverPendiente(' + p.id + ')">✓ Resolver</button>' : ''}
+        <button class="pend-btn danger" onclick="eliminarPendiente(${p.id})" title="Eliminar">✕</button>
+      </div>`;
+    wrap.appendChild(div);
+  });
+
+  if (isEnProceso) iniciarTimer();
+
+  const byCat = {};
+  pendientes.filter(p => p.minsTrabajados > 0).forEach(p => { byCat[p.cat] = (byCat[p.cat] || 0) + p.minsTrabajados; });
+  const totalCat = Object.values(byCat).reduce((s, v) => s + v, 0);
+  const resWrap = document.getElementById('pend-resumen-body');
+  resWrap.innerHTML = '';
+  if (totalCat === 0) { resWrap.innerHTML = '<p style="font-size:12px;color:var(--text-3)">Inicia un pendiente para ver el tiempo acumulado por categoría.</p>'; return; }
+  Object.entries(byCat).sort((a,b) => b[1]-a[1]).forEach(([cat, mins]) => {
+    const pct = Math.round(mins / totalCat * 100);
+    const color = CAT_COLORS[cat] || '#888';
+    resWrap.innerHTML += `<div class="resumen-row"><span class="resumen-cat">${cat}</span><div class="resumen-bar-track"><div class="resumen-bar-fill" style="width:${pct}%;background:${color}"></div></div><span class="resumen-stat">${minStr(mins)} · ${pct}%</span></div>`;
+  });
+}
+
+// restaurar timer si había uno activo al recargar
+window.addEventListener('load', () => {
+  if (pendientes.find(p => p.estado === 'proceso')) iniciarTimer();
+  actualizarBadgePend();
+});
+
+function abrirReporte() {
+  const acts = datos[fechaActual] || [];
+  const total = acts.reduce((s, a) => s + a.mins, 0);
+  const byCat = {};
+  acts.forEach(a => { byCat[a.cat] = (byCat[a.cat] || 0) + a.mins; });
+
+  document.getElementById('modal-title').textContent = 'Reporte — ' + formatFecha(fechaActual);
+
+  if (acts.length === 0) {
+    document.getElementById('modal-body').innerHTML = '<div class="empty-state"><p>No hay actividades registradas para este día.</p></div>';
+  } else {
+    const catRows = Object.entries(byCat).sort((a, b) => b[1] - a[1]).map(([cat, mins]) =>
+      `<tr><td><span class="badge ${CAT_BADGE[cat]||'badge-otro'}">${cat}</span></td><td style="font-weight:600">${minStr(mins)}</td><td style="color:var(--text-3)">${Math.round(mins/total*100)}%</td></tr>`
+    ).join('');
+
+    const actRows = acts.map(a =>
+      `<tr><td>${a.act}</td><td><span class="badge ${CAT_BADGE[a.cat]||'badge-otro'}">${a.cat}</span></td><td style="font-weight:600">${minStr(a.mins)}</td><td style="color:var(--text-3)">${Math.round(a.mins/total*100)}%</td>${a.notas ? '<td style="color:var(--text-3);font-size:11px">'+a.notas+'</td>' : '<td></td>'}</tr>`
+    ).join('');
+
+    document.getElementById('modal-body').innerHTML = `
+      <div class="report-section">
+        <h3>Resumen ejecutivo</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+          <div class="metric-card"><div class="label">Total</div><div class="value">${minStr(total)}</div></div>
+          <div class="metric-card"><div class="label">Actividades</div><div class="value">${acts.length}</div></div>
+          <div class="metric-card"><div class="label">Categorías</div><div class="value">${Object.keys(byCat).length}</div></div>
+        </div>
+      </div>
+      <div class="report-section">
+        <h3>Por categoría</h3>
+        <table class="report-table"><thead><tr><th>Categoría</th><th>Tiempo</th><th>%</th></tr></thead><tbody>${catRows}</tbody></table>
+      </div>
+      <div class="report-section">
+        <h3>Detalle de actividades</h3>
+        <table class="report-table"><thead><tr><th>Actividad</th><th>Categoría</th><th>Tiempo</th><th>%</th><th>Notas</th></tr></thead><tbody>${actRows}</tbody></table>
+      </div>`;
+  }
+  document.getElementById('overlay').classList.add('open');
+}
+
+function cerrarModal() {
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function exportarCSV() {
+  const acts = datos[fechaActual] || [];
+  if (acts.length === 0) { toast('No hay datos para exportar', true); return; }
+  const rows = [['Fecha', 'Actividad', 'Categoría', 'Minutos', 'Horas', 'Notas']];
+  acts.forEach(a => rows.push([fechaActual, a.act, a.cat, a.mins, (a.mins/60).toFixed(2), a.notas || '']));
+  const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'actividades-' + fechaActual + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+  toast('CSV exportado');
+}
+
+function exportarBackup() {
+  const backup = {
+    version: 1,
+    exportadoEn: new Date().toISOString(),
+    actividades: datos,
+    pendientes: pendientes
+  };
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fecha = new Date().toISOString().split('T')[0];
+  a.href = url; a.download = 'worktracker-respaldo-' + fecha + '.json';
+  a.click(); URL.revokeObjectURL(url);
+  toast('Respaldo guardado — guárdalo en OneDrive o tu escritorio');
+}
+
+function importarBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup.version || !backup.actividades) { toast('Archivo no válido', true); return; }
+
+      const diasActs = Object.keys(backup.actividades || {}).length;
+      const numPend = (backup.pendientes || []).length;
+
+      const diasActuales = Object.keys(datos).length;
+      const pendActuales = pendientes.length;
+
+      document.getElementById('restore-info').innerHTML = `
+        <div style="margin-bottom:12px">
+          <div style="font-size:13px;color:var(--text-2);margin-bottom:8px">El respaldo contiene:</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="metric-card"><div class="label">Días con actividades</div><div class="value">${diasActs}</div></div>
+            <div class="metric-card"><div class="label">Pendientes</div><div class="value">${numPend}</div></div>
+          </div>
+        </div>
+        <div style="background:var(--warning-bg);border:1px solid var(--warning);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--warning)">
+          <strong>Atención:</strong> Esto reemplazará tus datos actuales (${diasActuales} días · ${pendActuales} pendientes). Esta acción no se puede deshacer.
+        </div>`;
+      document.getElementById('restore-backup-data').dataset.backup = e.target.result;
+      document.getElementById('overlay-restore').classList.add('open');
+    } catch(err) {
+      toast('Error al leer el archivo', true);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function confirmarRestore() {
+  try {
+    const backup = JSON.parse(document.getElementById('restore-backup-data').dataset.backup);
+    datos = backup.actividades || {};
+    pendientes = backup.pendientes || [];
+    localStorage.setItem('worktracker', JSON.stringify(datos));
+    localStorage.setItem('worktracker-pend', JSON.stringify(pendientes));
+    document.getElementById('overlay-restore').classList.remove('open');
+    render();
+    renderPendientes();
+    actualizarBadgePend();
+    toast('Respaldo restaurado correctamente');
+  } catch(err) {
+    toast('Error al restaurar', true);
+  }
+}
+
+function cerrarRestore() {
+  document.getElementById('overlay-restore').classList.remove('open');
+}
+
+function importarExcelTeams(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      alert('✓ Archivo leído: ' + file.name + '\nTamaño: ' + file.size + ' bytes');
+      // Remove BOM if present, handle both UTF-8 and latin encodings
+      const raw = e.target.result.replace(/^\uFEFF/, '');
+      alert('Primeros 200 caracteres:\n' + raw.substring(0, 200));
+
+      // Check if it looks like binary (xlsx) — show instructions
+      if (raw.charCodeAt(0) === 80 && raw.charCodeAt(1) === 75) {
+        document.getElementById('modal-title').textContent = 'Importar reuniones de Teams';
+        document.getElementById('modal-body').innerHTML = `
+          <div style="text-align:center;padding:10px 0 20px">
+            <div style="font-size:15px;font-weight:600;margin-bottom:8px">Exporta el Excel como CSV primero</div>
+            <div style="font-size:13px;color:var(--text-2);max-width:380px;margin:0 auto;line-height:1.6">
+              En tu archivo de OneDrive:<br><br>
+              <strong>Archivo → Guardar como → CSV UTF-8</strong><br><br>
+              Luego usa ese CSV aquí.
+            </div>
+          </div>`;
+        document.getElementById('overlay').classList.add('open');
+        input.value = '';
+        return;
+      }
+
+      const lines = raw.split(/\r?\n/).filter(l => l.trim());
+      if (lines.length < 2) { toast('El archivo está vacío', true); input.value=''; return; }
+
+      // Auto-detect separator: semicolon or comma
+      const sep = lines[0].includes(';') ? ';' : ',';
+
+      // Detect header columns
+      const headers = lines[0].split(sep).map(h => h.replace(/"/g,'').trim().toLowerCase());
+      const iActividad = headers.findIndex(h => h.includes('actividad') || h.includes('subject') || h.includes('asunto'));
+      const iFecha = headers.findIndex(h => h.includes('fecha') || h.includes('start') || h.includes('inicio'));
+      const iDuracion = headers.findIndex(h => h.includes('durac') || h.includes('duration'));
+      const iNotas = headers.findIndex(h => h.includes('nota') || h.includes('note') || h.includes('categor'));
+
+      let importadas = 0, duplicadas = 0;
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(sep);
+        const clean = c => (c || '').replace(/^"|"$/g, '').trim();
+
+        const actividad = clean(cols[iActividad >= 0 ? iActividad : 0]);
+        const fechaRaw  = clean(cols[iFecha    >= 0 ? iFecha    : 1]);
+        const duracionRaw = clean(cols[iDuracion >= 0 ? iDuracion : 2]);
+        const notas     = clean(cols[iNotas    >= 0 ? iNotas    : 3] || '');
+
+        if (!actividad) continue;
+
+        // Parse date
+        let fecha = hoy();
+        try {
+          const d = new Date(fechaRaw);
+          if (!isNaN(d)) fecha = d.toISOString().split('T')[0];
+        } catch(e) {}
+
+        // Parse duration (minutes number or hh:mm)
+        let mins = 60;
+        if (duracionRaw) {
+          if (duracionRaw.includes(':')) {
+            const parts = duracionRaw.split(':');
+            mins = parseInt(parts[0]) * 60 + parseInt(parts[1] || 0);
+          } else {
+            mins = Math.round(parseFloat(duracionRaw)) || 60;
+          }
+        }
+
+        if (!datos[fecha]) datos[fecha] = [];
+        const existe = datos[fecha].some(a => a.act === actividad);
+        if (existe) { duplicadas++; continue; }
+
+        datos[fecha].push({
+          id: Date.now() + i,
+          act: actividad,
+          mins: mins,
+          cat: 'Reunión',
+          notas: notas || 'Importado desde Teams'
+        });
+        importadas++;
+      }
+
+      localStorage.setItem('worktracker', JSON.stringify(datos));
+      // Switch to the date of first imported meeting
+      const primerDia = Object.keys(datos).sort().reverse()[0];
+      if (primerDia) { fechaActual = primerDia; document.getElementById('fecha-sel').value = primerDia; actualizarTopbar(); }
+      render();
+      input.value = '';
+
+      if (importadas === 0 && duplicadas > 0) {
+        toast('Todas las reuniones ya estaban registradas (' + duplicadas + ' duplicadas)');
+      } else if (importadas === 0) {
+        toast('No se encontraron reuniones en el archivo', true);
+      } else {
+        toast('✓ ' + importadas + ' reunión' + (importadas !== 1 ? 'es' : '') + ' importada' + (importadas !== 1 ? 's' : '') + ' correctamente');
+      }
+    } catch(err) {
+      toast('Error al leer el archivo: ' + err.message, true);
+      console.error(err);
+      input.value = '';
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+
+  const el = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  el.style.background = error ? 'var(--danger)' : 'var(--text)';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+init();
+</script>
+</body>
+</html>
